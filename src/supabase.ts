@@ -7,9 +7,24 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export async function callEdge<T = any>(
   fnName: string,
-  body?: Record<string, any>
+  optionsOrBody?: any
 ): Promise<T> {
-  const { data, error } = await supabase.functions.invoke<T>(fnName, body ? { body } : {});
+  // Se o fnName começa com "/", trata como sub-rota da function principal "claude_meta_ads"
+  const targetFunction = fnName.startsWith("/")
+    ? `claude_meta_ads${fnName}`
+    : fnName;
+
+  let invokeOptions: any = {};
+  if (optionsOrBody) {
+    const hasInvokeKeys = ["body", "headers", "method", "query"].some(key => key in optionsOrBody);
+    if (hasInvokeKeys) {
+      invokeOptions = optionsOrBody;
+    } else {
+      invokeOptions = { body: optionsOrBody };
+    }
+  }
+
+  const { data, error } = await supabase.functions.invoke<T>(targetFunction, invokeOptions);
   if (error) throw new Error(error.message);
   return data as T;
 }
