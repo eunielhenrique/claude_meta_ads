@@ -6,3 +6,4 @@ dist/
 *.log
 supabase/.env
 supabase/.temp/
+.vercel
