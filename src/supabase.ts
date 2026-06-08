@@ -5,11 +5,11 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-export async function callEdge<T = unknown>(
+export async function callEdge<T = any>(
   fnName: string,
-  body: Record<string, unknown>
+  body?: Record<string, any>
 ): Promise<T> {
-  const { data, error } = await supabase.functions.invoke<T>(fnName, { body });
+  const { data, error } = await supabase.functions.invoke<T>(fnName, body ? { body } : {});
   if (error) throw new Error(error.message);
   return data as T;
 }
